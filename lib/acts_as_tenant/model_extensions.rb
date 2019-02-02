@@ -126,7 +126,7 @@ module ActsAsTenant
             keys = [ActsAsTenant.current_tenant.send(pkey)]
 
             # also include all secondary tenant data 
-            (keys.push ActsAsTenant.secondary_tenants.map { |t| t.send(pkey) }).flatten!.uniq!
+            (keys.push ActsAsTenant.secondary_tenants.map { |t| t.send(pkey) }).flatten!.uniq! if options[:has_secondary_tenants]
             
             keys.push(nil) if options[:has_global_records]
 
