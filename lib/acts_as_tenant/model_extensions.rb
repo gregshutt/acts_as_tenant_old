@@ -43,7 +43,7 @@ module ActsAsTenant
   end
 
   def self.secondary_tenants
-    RequestStore.store[:secondary_tenants]
+    RequestStore.store[:secondary_tenants] || []
   end
 
   def self.unscoped=(unscoped)
@@ -124,6 +124,10 @@ module ActsAsTenant
           end
           if ActsAsTenant.current_tenant
             keys = [ActsAsTenant.current_tenant.send(pkey)]
+
+            # also include all secondary tenant data 
+            (keys.push ActsAsTenant.secondary_tenants.map { |t| t.send(pkey) }).flatten
+
             keys.push(nil) if options[:has_global_records]
 
             query_criteria = { fkey.to_sym => keys }
