@@ -79,6 +79,14 @@ module ActsAsTenant
           def current_tenant
             ActsAsTenant.current_tenant
           end
+
+          def set_secondary_tenants(secondary_tenant_objects)
+            ActsAsTenant.secondary_tenants = secondary_tenant_objects
+          end
+
+          def secondary_tenants
+            ActsAsTenant.secondary_tenants
+          end
       end
     end
   end

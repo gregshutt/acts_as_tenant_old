@@ -38,6 +38,14 @@ module ActsAsTenant
     RequestStore.store[:current_tenant] || self.default_tenant
   end
 
+  def self.secondary_tenants=(tenants)
+    RequestStore.store[:secondary_tenants] = tenants
+  end
+
+  def self.secondary_tenants
+    RequestStore.store[:secondary_tenants]
+  end
+
   def self.unscoped=(unscoped)
     RequestStore.store[:acts_as_tenant_unscoped] = unscoped
   end
