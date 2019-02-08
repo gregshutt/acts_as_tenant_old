@@ -126,12 +126,18 @@ module ActsAsTenant
             keys = [ActsAsTenant.current_tenant.send(pkey)]
 
             keys.push(nil) if options[:has_global_records]
-            (keys.push ActsAsTenant.secondary_tenants.map { |t| t.send(pkey) }).flatten!.uniq! if options[:has_secondary_tenants]
 
             query_criteria = { fkey.to_sym => keys }
             query_criteria.merge!({ polymorphic_type.to_sym => ActsAsTenant.current_tenant.class.to_s }) if options[:polymorphic]
 
-            where(query_criteria)
+            if options[:has_secondary_tenants]
+              # build up a query that includes keys from the secondary tenant table
+              secondary_tenant_model = options[:has_secondary_tenants]
+              includes(secondary_tenant_model).where(query_criteria)
+                .or(includes(secondary_tenant_model).where(secondary_tenant_model => { id: keys }))
+            else
+              where(query_criteria)
+            end
           else
             ActiveRecord::VERSION::MAJOR < 4 ? scoped : all
           end
