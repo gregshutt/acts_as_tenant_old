@@ -38,14 +38,6 @@ module ActsAsTenant
     RequestStore.store[:current_tenant] || self.default_tenant
   end
 
-  def self.secondary_tenants=(tenants)
-    RequestStore.store[:secondary_tenants] = tenants
-  end
-
-  def self.secondary_tenants
-    RequestStore.store[:secondary_tenants] || []
-  end
-
   def self.unscoped=(unscoped)
     RequestStore.store[:acts_as_tenant_unscoped] = unscoped
   end
@@ -132,9 +124,7 @@ module ActsAsTenant
 
             if options[:has_secondary_tenants]
               # build up a query that includes keys from the secondary tenant table
-              secondary_tenant_model = options[:has_secondary_tenants]
-              includes(secondary_tenant_model).where(query_criteria)
-                .or(includes(secondary_tenant_model).where(secondary_tenant_model => { id: keys }))
+              where(query_criteria).or(where("? = ANY(#{options[:has_secondary_tenants]})", ActsAsTenant.current_tenant.send(pkey)))
             else
               where(query_criteria)
             end
